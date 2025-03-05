@@ -23,9 +23,21 @@ public class ColumnTest {
 
         entityManager.persist(customer);
         entityTransaction.commit();
-
         entityManager.close();
-        entityManagerFactory.close();
+    }
 
+    @Test
+    void transientTest() {
+        entityTransaction.begin();
+
+        Customer customer = new Customer();
+        customer.setId("1");
+        customer.setName("Addien");
+        customer.setPrimaryEmail("contoh@example.com");
+        customer.setFullname("Fauzan Addien");
+
+        entityManager.persist(customer);
+        entityTransaction.commit();
+        entityManager.close();
     }
 }

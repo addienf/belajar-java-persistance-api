@@ -10,6 +10,9 @@ public class Customer {
     private String id;
     private String name;
 
+    @Transient
+    private String fullname;
+
     @Column(name = "primary_email")
     private String primaryEmail;
     private Boolean marriage;
@@ -17,6 +20,14 @@ public class Customer {
 
     @Enumerated(EnumType.STRING)
     private CustomerType type;
+
+    public String getFullname() {
+        return fullname;
+    }
+
+    public void setFullname(String fullname) {
+        this.fullname = fullname;
+    }
 
     public CustomerType getType() {
         return type;

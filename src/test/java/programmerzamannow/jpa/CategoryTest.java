@@ -4,30 +4,32 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
 import org.junit.jupiter.api.Test;
-import programmerzamannow.jpa.entity.Customer;
-import programmerzamannow.jpa.entity.CustomerType;
+import programmerzamannow.jpa.entity.Category;
 import programmerzamannow.jpa.util.JpaUtil;
 
-public class EnumTest {
+import java.time.LocalDateTime;
+import java.util.Calendar;
+
+public class CategoryTest {
+
     EntityManagerFactory entityManagerFactory = JpaUtil.getEntityManagerFactory();
     EntityManager entityManager = entityManagerFactory.createEntityManager();
     EntityTransaction entityTransaction = entityManager.getTransaction();
 
     @Test
-    void insertEnumTest() {
+    void insertCategory() {
         entityTransaction.begin();
 
-        Customer customer = new Customer();
-        customer.setId("1");
-        customer.setName("Fauzan");
-        customer.setPrimaryEmail("contoh@example.com");
-        customer.setAge((byte) 24);
-        customer.setMarriage(true);
-        customer.setType(CustomerType.PREMIUM);
+        Category category = new Category();
+        category.setName("Food");
+        category.setDescription("Diskon 60%");
+        category.setCreatedAt(Calendar.getInstance());
+        category.setUpdatedAt(LocalDateTime.now());
 
-        entityManager.persist(customer);
+        entityManager.persist(category);
 
         entityTransaction.commit();
+
         entityManager.close();
     }
 }
