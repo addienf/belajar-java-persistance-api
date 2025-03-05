@@ -3,6 +3,7 @@ package programmerzamannow.jpa;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import programmerzamannow.jpa.entity.Category;
 import programmerzamannow.jpa.util.JpaUtil;
@@ -30,6 +31,21 @@ public class CategoryTest {
 
         entityTransaction.commit();
 
+        entityManager.close();
+    }
+
+    @Test
+    void insertListener() {
+        entityTransaction.begin();
+
+        Category category = new Category();
+        category.setName("Contoh");
+        category.setDescription("Contoh Desc");
+
+        entityManager.persist(category);
+        Assertions.assertNotNull(category.getUpdatedAt());
+
+        entityTransaction.commit();
         entityManager.close();
     }
 }
