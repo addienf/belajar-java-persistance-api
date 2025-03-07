@@ -2,12 +2,10 @@ package programmerzamannow.jpa;
 
 import jakarta.persistence.*;
 import org.junit.jupiter.api.Test;
-import programmerzamannow.jpa.entity.Brand;
-import programmerzamannow.jpa.entity.Member;
-import programmerzamannow.jpa.entity.Product;
-import programmerzamannow.jpa.entity.User;
+import programmerzamannow.jpa.entity.*;
 
 import java.util.List;
+import java.util.Objects;
 
 public class QueryTest {
     EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("BELAJAR");
@@ -99,5 +97,62 @@ public class QueryTest {
         for (Brand brand : brands){
             System.out.println(brand.getName());
         }
+    }
+
+    @Test
+    void someFields() {
+        TypedQuery<Object[]> query = entityManager
+                .createQuery("select b.id, b.name from Brand b where b.name = :name", Object[].class);
+        query.setParameter("name", "Xiaomi");
+        List<Object[]> objects = query.getResultList();
+
+        for (Object[] object : objects){
+            System.out.println(object[1]);
+        }
+    }
+
+    @Test
+    void constructorExpression() {
+        TypedQuery<SimpleBrand> query = entityManager.createQuery(
+           "select new programmerzamannow.jpa.entity.SimpleBrand(b.id, b.name)" +
+                   "from Brand b where b.name = :name", SimpleBrand.class
+        );
+
+        query.setParameter("name", "Xiaomi");
+
+        List<SimpleBrand> simpleBrands = query.getResultList();
+
+        for (var simpleBrand : simpleBrands){
+            System.out.println(simpleBrand.getName());
+        }
+    }
+
+    @Test
+    void aggregateFunction() {
+
+        TypedQuery<Object[]> query = entityManager.createQuery(
+                "select min(p.price), max(p.price), avg(p.price) from Product p", Object[].class
+        );
+
+        Object[] result = query.getSingleResult();
+
+        System.out.println("Min " + result[0]);
+        System.out.println("Max " + result[1]);
+        System.out.println("Average " + result[2]);
+    }
+
+    @Test
+    void groupByDanHaving() {
+
+        TypedQuery<Object[]> query = entityManager.createQuery(
+                "select min(p.price), max(p.price), avg(p.price) from Product p join p.brand b" +
+                "", Object[].class
+        );
+
+        Object[] result = query.getSingleResult();
+
+        System.out.println("Min " + result[0]);
+        System.out.println("Max " + result[1]);
+        System.out.println("Average " + result[2]);
     }
 }
