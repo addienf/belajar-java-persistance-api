@@ -5,9 +5,7 @@ import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import programmerzamannow.jpa.entity.Credential;
-import programmerzamannow.jpa.entity.User;
-import programmerzamannow.jpa.entity.Wallet;
+import programmerzamannow.jpa.entity.*;
 import programmerzamannow.jpa.util.JpaUtil;
 
 public class OneToOneTest {
@@ -79,6 +77,16 @@ public class OneToOneTest {
 
         Assertions.assertNotNull(user.getWallet());
         Assertions.assertEquals(1_000_000L, user.getWallet().getBalance());
+
+        entityTransaction.commit();
+        entityManager.close();
+    }
+
+    @Test
+    void fetch() {
+        entityTransaction.begin();
+
+        Product product = entityManager.find(Product.class, "p1");
 
         entityTransaction.commit();
         entityManager.close();
