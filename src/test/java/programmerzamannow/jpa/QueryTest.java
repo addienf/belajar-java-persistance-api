@@ -145,14 +145,41 @@ public class QueryTest {
     void groupByDanHaving() {
 
         TypedQuery<Object[]> query = entityManager.createQuery(
-                "select min(p.price), max(p.price), avg(p.price) from Product p join p.brand b" +
-                "", Object[].class
+                "select b.id, min(p.price), max(p.price), avg(p.price) from Product p join p.brand b" +
+                " group by b.id having min(p.price) > :min", Object[].class
+        );
+        query.setParameter("min", 500_000L);
+
+        List<Object[]> objects = query.getResultList();
+
+        for (var object : objects){
+            System.out.println("Brand " + object[0]);
+            System.out.println("Min " + object[1]);
+            System.out.println("Max " + object[2]);
+            System.out.println("Average " + object[3]);
+        }
+    }
+
+    @Test
+    void nativeQuery() {
+        Query query = entityManager.createNativeQuery(
+          "select * from brands where brands.created_at is not null", Brand.class
         );
 
-        Object[] result = query.getSingleResult();
+        List<Brand> brands = query.getResultList();
 
-        System.out.println("Min " + result[0]);
-        System.out.println("Max " + result[1]);
-        System.out.println("Average " + result[2]);
+        for (var brand : brands){
+            System.out.println(brand.getId() + " : " + brand.getName() + " : " + brand.getCreatedAt());
+        }
+    }
+
+    @Test
+    void namedNativeQuery() {
+        TypedQuery<Brand> query = entityManager.createNamedQuery("Brand.native.findAll", Brand.class);
+        List<Brand> brands = query.getResultList();
+
+        for (var brand : brands){
+            System.out.println(brand.getId() + " : " + brand.getName() + " : " + brand.getCreatedAt());
+        }
     }
 }
