@@ -1,9 +1,6 @@
 package programmerzamannow.jpa;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.EntityTransaction;
-import jakarta.persistence.TypedQuery;
+import jakarta.persistence.*;
 import jakarta.persistence.criteria.*;
 import org.junit.jupiter.api.Test;
 import programmerzamannow.jpa.entity.Brand;
@@ -147,5 +144,43 @@ public class CriteriaTest {
         }
     }
 
+    @Test
+    void aggregateCriteria() {
+        CriteriaQuery<Object[]> criteria = criteriaBuilder.createQuery(Object[].class);
+        Root<Product> productRoot = criteria.from(Product.class);
+        Join<Product, Brand> brandRoot = productRoot.join("brand");
 
+        criteria.select(
+                criteriaBuilder.array(
+                        brandRoot.get("id"), criteriaBuilder.min(productRoot.get("price")),
+                        criteriaBuilder.max(productRoot.get("price")), criteriaBuilder.avg(productRoot.get("price"))
+                )
+        );
+
+        criteria.groupBy(brandRoot.get("id"));
+        criteria.having(criteriaBuilder.greaterThan(criteriaBuilder.min(productRoot.get("price")), 500_000L));
+
+        TypedQuery<Object[]> query = entityManager.createQuery(criteria);
+        List<Object[]> objects = query.getResultList();
+
+        for (var object : objects){
+            System.out.println("Brand : " + object[0]);
+            System.out.println("Min : " +object[1]);
+            System.out.println("Max : " +object[2]);
+            System.out.println("Average : " +object[3]);
+        }
+    }
+
+    @Test
+    void criteriaUpdate() {
+        CriteriaUpdate<Brand> criteria = criteriaBuilder.createCriteriaUpdate(Brand.class);
+        Root<Brand> brandRoot = criteria.from(Brand.class);
+
+        criteria.set(brandRoot.get("name"), "Apple Update");
+        criteria.where(criteriaBuilder.equal(brandRoot.get("id"), "apple"));
+
+        Query query = entityManager.createQuery(criteria);
+        int impactedRecords = query.executeUpdate();
+        System.out.println("Success Update" + impactedRecords + " records");
+    }
 }
